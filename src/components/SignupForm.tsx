@@ -264,7 +264,7 @@ const org = { id: orgData.org_id };
               org_id: org.id,
               app_id: app.id,
               granted_by: "promo",
-              expires_at: org.promo_expires_at,
+              expires_at: promoExpires,
             }))
           );
         }
