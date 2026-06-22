@@ -1,0 +1,46 @@
+```css
+.alert {
+  border-radius: var(--radius-lg);
+  padding: 10px 13px;
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert-error {
+  background: var(--error-light);
+  border-left: 3px solid var(--error);
+  color: #7a1f17;
+}
+
+.alert-success {
+  background: var(--success-light);
+  border-left: 3px solid var(--success);
+  color: #14532d;
+}
+
+.alert-info {
+  background: var(--frost-light);
+  border-left: 3px solid var(--blue-signal);
+  color: #1e3a6e;
+}
+
+.icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1.3;
+}
+```
