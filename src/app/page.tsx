@@ -1,4 +1,3 @@
-import React from "react";
 import { Metadata } from "next";
 import { BrandLogo } from "@/components/BrandLogo";
 import { SignupForm } from "@/components/SignupForm";

@@ -1,5 +1,4 @@
-```typescript
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import styles from "./Alert.module.css";
 
 export type AlertType = "error" | "success" | "info";
@@ -21,7 +20,7 @@ export function Alert({
   type,
   message,
   onDismiss,
-  dismissAfter = 5000,
+  dismissAfter,
 }: AlertProps) {
   useEffect(() => {
     if (dismissAfter && onDismiss) {
@@ -30,11 +29,22 @@ export function Alert({
     }
   }, [dismissAfter, onDismiss]);
 
+  const alertTypeClass = styles[`alert-${type}`];
+
   return (
-    <div className={`${styles.alert} ${styles[`alert-${type}`]}`}>
+    <div className={`${styles.alert} ${alertTypeClass}`}>
       <span className={styles.icon}>{iconMap[type]}</span>
-      <span>{message}</span>
+      <span className={styles.message}>{message}</span>
+      {onDismiss && (
+        <button
+          type="button"
+          className={styles.dismiss}
+          onClick={onDismiss}
+          aria-label="Dismiss"
+        >
+          ✕
+        </button>
+      )}
     </div>
   );
 }
-```

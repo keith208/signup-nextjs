@@ -1,5 +1,3 @@
-```typescript
-import React from "react";
 import styles from "./AccountTypeSelector.module.css";
 
 export type AccountType = "personal" | "personal_plus" | "business";
@@ -48,7 +46,8 @@ export function AccountTypeSelector({
       {types.map((type) => (
         <button
           key={type.id}
-          className={`${styles.button} ${styles[`selected-${value === type.id ? type.id : ""}`]}`}
+          type="button"
+          className={styles.button}
           onClick={() => onChange(type.id)}
           data-selected={value === type.id}
         >
@@ -63,4 +62,4 @@ export function AccountTypeSelector({
     </div>
   );
 }
-```
+

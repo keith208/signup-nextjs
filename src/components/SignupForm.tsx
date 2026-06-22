@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
 import { isPersonalEmail, isValidEmail } from "@/lib/emailValidation";
 import { AccountTypeSelector, type AccountType } from "./AccountTypeSelector";
@@ -26,6 +27,12 @@ interface AlertState {
   message: string;
 }
 
+interface PromoGrant {
+  valid: boolean;
+  duration_days: number;
+  applies_to_all_apps: boolean;
+}
+
 export function SignupForm() {
   const [form, setForm] = useState<FormState>({
     orgName: "",
@@ -38,12 +45,13 @@ export function SignupForm() {
   const [alert, setAlert] = useState<AlertState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [promoValidated, setPromoValidated] = useState(false);
-  const [promoGrant, setPromoGrant] = useState<any>(null);
+  const [promoGrant, setPromoGrant] = useState<PromoGrant | null>(null);
   const [showRedirectNotice, setShowRedirectNotice] = useState(false);
 
   const handleAccountTypeChange = (type: AccountType) => {
     setAccountType(type);
     setAlert(null);
+    setShowRedirectNotice(false);
 
     if (type === "personal_plus" && form.email) {
       handleAccountTypeSelection(type, form.email);
@@ -60,7 +68,7 @@ export function SignupForm() {
     }
   };
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     const email = e.target.value.trim();
     setForm((prev) => ({ ...prev, email }));
 
@@ -144,7 +152,7 @@ export function SignupForm() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setAlert(null);
 
@@ -187,10 +195,10 @@ export function SignupForm() {
         return;
       }
 
-      const seatLimits: Record<AccountType, number> = {
+      const seatLimits: Record<AccountType, number | null> = {
         personal: 1,
         personal_plus: 5,
-        business: 5,
+        business: null,
       };
 
       const { data: org, error: orgError } = await supabase
@@ -213,11 +221,16 @@ export function SignupForm() {
         return;
       }
 
-      await supabase.from("org_members").insert({
+      const { error: memberError } = await supabase.from("org_members").insert({
         org_id: org.id,
         user_id: user.id,
         role: "owner",
       });
+
+      if (memberError) {
+        showError("Failed to add user to organization: " + memberError.message);
+        return;
+      }
 
       if (promoGrant?.applies_to_all_apps) {
         const { data: apps } = await supabase
@@ -382,7 +395,7 @@ export function SignupForm() {
             {promoValidated ? "Applied ✓" : "Apply"}
           </button>
         </div>
-        {promoValidated && (
+        {promoValidated && promoGrant && (
           <div className={styles.promoHint} style={{ color: "var(--success)" }}>
             ✓ Promo applied — {promoGrant.duration_days}-day trial,{" "}
             {promoGrant.applies_to_all_apps ? "all apps" : "selected apps"}.

@@ -1,5 +1,3 @@
-```typescript
-import React from "react";
 import styles from "./BrandLogo.module.css";
 
 interface BrandLogoProps {
@@ -29,4 +27,3 @@ export function BrandLogo({ appName = "Platform" }: BrandLogoProps) {
     </div>
   );
 }
-```
