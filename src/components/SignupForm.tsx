@@ -201,36 +201,57 @@ export function SignupForm() {
         business: null,
       };
 
-      const { data: org, error: orgError } = await supabase
-        .from("organizations")
-        .insert({
-          name: form.orgName,
-          account_type: accountType,
-          seat_limit: seatLimits[accountType],
-          subscription_status: promoGrant ? "trialing" : "inactive",
-          promo_code_used: form.promoCode || null,
-          promo_expires_at: promoGrant
-            ? new Date(Date.now() + promoGrant.duration_days * 86400000)
-            : null,
-        })
-        .select()
-        .single();
+  // Call Edge Function to create org + member (bypasses RLS)
+const signupFunctionUrl = "https://owgovplzxyosovctmafe.supabase.co/functions/v1/signup-ts";
+// Replace YOUR_PROJECT_ID with your actual Supabase project ID
 
-      if (orgError) {
-        showError("Failed to create organization: " + orgError.message);
-        return;
-      }
+const promoExpires = promoGrant
+  ? new Date(Date.now() + promoGrant.duration_days * 86400000)
+  : null;
 
-      const { error: memberError } = await supabase.from("org_members").insert({
-        org_id: org.id,
-        user_id: user.id,
-        role: "owner",
-      });
+const { data: orgData, error: orgError } = await (async () => {
+  try {
+    const response = await fetch(signupFunctionUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orgName: form.orgName,
+        accountType: accountType,
+        promoCode: form.promoCode || null,
+        promoExpires: promoExpires,
+        seatLimit: seatLimits[accountType],
+        userId: user.id,
+        promoStatus: promoGrant ? "trialing" : "inactive",
+      }),
+    });
 
-      if (memberError) {
-        showError("Failed to add user to organization: " + memberError.message);
-        return;
-      }
+    if (!response.ok) {
+      const error = await response.json();
+      return { data: null, error: { message: error.error || "Unknown error" } };
+    }
+
+    const data = await response.json();
+    return { data, error: null };
+  } catch (err) {
+    return {
+      data: null,
+      error: { message: err instanceof Error ? err.message : "Request failed" },
+    };
+  }
+})();
+
+if (orgError) {
+  showError("Failed to create organization: " + orgError.message);
+  return;
+}
+
+if (!orgData || !orgData.org_id) {
+  showError("Failed to create organization.");
+  return;
+}
+
+// Continue with promo app access if applicable
+const org = { id: orgData.org_id };
 
       if (promoGrant?.applies_to_all_apps) {
         const { data: apps } = await supabase
