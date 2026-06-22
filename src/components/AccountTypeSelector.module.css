@@ -1,0 +1,105 @@
+
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.button {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  padding: 12px 8px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+  position: relative;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.button:hover {
+  border-color: #b8b0a0;
+}
+
+.button[data-selected="true"] {
+  border-width: 2px;
+  border-color: var(--blue-signal);
+  background: var(--frost-light);
+}
+
+.icon {
+  font-size: 18px;
+  display: block;
+}
+
+.name {
+  font-size: 12px;
+  font-weight: 600;
+  display: block;
+  color: var(--text);
+}
+
+.description {
+  font-size: 10.5px;
+  color: var(--muted);
+  display: block;
+  margin-top: 1px;
+}
+
+.badge {
+  position: absolute;
+  top: -7px;
+  right: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  color: white;
+}
+
+.badge[data-type="personal"] {
+  background: #0d6e67;
+}
+
+.badge[data-type="personal_plus"] {
+  background: #5b21b6;
+}
+
+.badge[data-type="business"] {
+  background: #004080;
+}
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .button {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    padding: 10px 12px;
+    gap: 10px;
+    flex-direction: row;
+  }
+
+  .icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .badge {
+    top: 6px;
+    right: 10px;
+  }
+}
+```
